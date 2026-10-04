@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-800 text-white flex flex-col">
+            <div class="p-4 text-2xl font-bold border-b border-gray-700">StudentAdmin</div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full text-left p-2 rounded bg-gray-700 hover:bg-gray-600 transition">Dashboard</button>
+                <button onclick="switchTab('students')" id="nav-students" class="w-full text-left p-2 rounded hover:bg-gray-600 transition">Student List</button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-8">
+            
+            <!-- Dashboard Tab -->
+            <section id="dashboard-tab" class="space-y-6">
+                <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-blue-500 text-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-semibold">Total Students</h2>
+                        <p id="dash-total" class="text-4xl font-bold mt-2">0</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Department-wise Count</h2>
+                        <ul id="dash-dept" class="space-y-2"></ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2">Year/Semester Summary</h2>
+                        <ul id="dash-year" class="space-y-2"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Students Tab -->
+            <section id="students-tab" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-3xl font-bold text-gray-800">Student List</h1>
+                    <button onclick="openModal('add')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow font-medium">
+                        + Add Student
+                    </button>
+                </div>
+
+                <!-- Filters & Search -->
+                <div class="bg-white p-4 rounded-lg shadow flex flex-wrap gap-4 items-center">
+                    <input type="text" id="search-input" placeholder="Search by Reg No or Name..." class="border p-2 rounded flex-1 min-w-[200px]">
+                    <select id="filter-dept" class="border p-2 rounded">
+                        <option value="">All Departments</option>
+                        <option value="AIDS">AIDS</option>
+                        <option value="AIDS">AIDS</option>
+                        <option value="AIDS">AIDS</option>
+                        <option value="AIDS">AIDS</option>
+                    </select>
+                    <select id="sort-select" class="border p-2 rounded">
+                        <option value="name-asc">Sort by Name (Asc)</option>
+                        <option value="name-desc">Sort by Name (Desc)</option>
+                        <option value="reg-asc">Sort by Reg No (Asc)</option>
+                        <option value="reg-desc">Sort by Reg No (Desc)</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200 text-gray-700">
+                                <th class="p-3 border-b">Register No</th>
+                                <th class="p-3 border-b">Name</th>
+                                <th class="p-3 border-b">Dept</th>
+                                <th class="p-3 border-b">Year/Sem</th>
+                                <th class="p-3 border-b">Email</th>
+                                <th class="p-3 border-b">Phone</th>
+                                <th class="p-3 border-b text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body">
+                            <!-- Rows rendered via JS -->
+                        </tbody>
+                    </table>
+                    <div id="empty-state" class="hidden p-8 text-center text-gray-500">
+                        No students found.
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h2 id="modal-title" class="text-xl font-bold">Add Student</h2>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+            </div>
+            <form id="student-form" class="p-4 space-y-4">
+                <input type="hidden" id="form-mode" value="add">
+                <input type="hidden" id="original-reg" value="">
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1">Register Number *</label>
+                    <input type="text" id="regNo" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Name *</label>
+                    <input type="text" id="name" class="w-full border p-2 rounded" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Department *</label>
+                        <select id="department" class="w-full border p-2 rounded" required>
+                            <option value="">Select...</option>
+                            <option value="AIDS">AIDS</option>
+                            <option value="AIDS">AIDS</option>
+                            <option value="AIDS">AIDS</option>
+                            <option value="AIDS">AIDS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Year / Semester *</label>
+                        <input type="text" id="yearSem" placeholder="e.g. III / V" class="w-full border p-2 rounded" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Email *</label>
+                    <input type="email" id="email" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Phone Number *</label>
+                    <input type="text" id="phone" pattern="\d{10}" title="10 digit mobile number" class="w-full border p-2 rounded" required>
+                </div>
+                <div id="form-error" class="text-red-500 text-sm hidden"></div>
+                <div class="flex justify-end pt-4 border-t gap-2">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

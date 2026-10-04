@@ -1,0 +1,20 @@
+[
+    {
+        "registerNo": "23IT001",
+        "name": "Arun Kumar",
+        "email": "arun@example.com",
+        "phone": "9876543210",
+        "department": "IT",
+        "year": "III",
+        "semester": "V"
+    },
+    {
+        "registerNo": "23CSE02",
+        "name": "Bala Murugan",
+        "email": "bala@example.com",
+        "phone": "9876543211",
+        "department": "CSE",
+        "year": "II",
+        "semester": "III"
+    }
+]
